@@ -13,16 +13,16 @@ def connect(command):
 
         cur = conn.cursor()
 
-        cur.execute('SELECT * from katten')
+        cur.execute(command)
+        result = cur.fetchall()
+        print(result)
 
+        # Print entire DB
+        cur.execute('SELECT * from katten')
         db_all = cur.fetchall()
         print(db_all)
 
-        for command in commands:
-            cur.execute(command)
-            probeersel = cur.fetchall()
-            print(probeersel)
-
+        # Close and save
         cur.close()
         conn.commit()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -31,16 +31,23 @@ def connect(command):
         if conn is not None:
             conn.close()
             print('Database connection closed.')
-
+    return result
 
 @app.route('/', methods =["GET"])
 def view():
-    commands = (
-    """
-    SELECT * FROM katten;
-    """,
-    )
-    connect(commands)
+    command = """SELECT * FROM katten;"""
+    poepout = connect(command)
+    return str(poepout)
+
+@app.route('/delete', methods =["GET", "POST"])
+def delete():
+    name2del = request.args['naam']
+
+    command = f"""SELECT * FROM katten WHERE naam='{name2del}';"""
+
+    poepout = connect(command)
+    return str(poepout)
+
 
 
 if __name__=='__main__':
