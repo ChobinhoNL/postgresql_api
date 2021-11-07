@@ -1,0 +1,13 @@
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+</head>
+
+
+        <form action="{{ url_for("delete")}}" method="post">
+            <label for="Startdatum"><h4 class="display-6">Welke kat wil je verwijderen? </h4></label>
+            <div class="input-group mb-3 row">
+                <div class="col-auto"><input type="text" class="form-control" id="date" name="naam" placeholder="Naam van de te verwijderen kat."></div>
+                <div class="col-auto align-center"><button type="submit" class="btn btn-primary">Verwijder kat :(</button></div>
+            </div>
+        </form>
+

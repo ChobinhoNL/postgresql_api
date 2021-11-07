@@ -21,9 +21,9 @@ def connect(command):
             result = "Mutated!"
 
         # Print entire DB
-        cur.execute('SELECT * from katten')
-        db_all = cur.fetchall()
-        print(db_all)
+        # cur.execute('SELECT * from katten')
+        # db_all = cur.fetchall()
+        # print(db_all)
 
         # Close and save
         cur.close()
@@ -40,51 +40,56 @@ def connect(command):
 def view():
     command = """SELECT * FROM katten;"""
     poepout = connect(command)
-    return f"""
-    <h2>Visual DB representation</h2>
-    <p>{str(poepout)}</p>
-    <br>
-    <h3>API calls</h3>
-    <br>
-    <h5>/</h5>
-    <p>This page, shows the full Database.</p>
-    <h5>/delete?naam=...</h5>
-    <p>Takes the name and deletes it from the DB if present.</p>
-    <h5>/add?naam=...&kleur=...&leeftijd=...</h5>
-    <p>Adds the name, color and age of the cat. Age must be an integer.</p>
-    <h5>/edit?naam=...&leeftijd=...</h5>
-    <p>Mutates the age of the mentioned cat (if present) into the input. Age must be an integer.</p>
-    """
+    return render_template("index.html", poepout=poepout)
 
 @app.route('/delete', methods =["GET", "POST"])
 def delete():
-    name2del = request.args['naam']
-
-    command = f"""DELETE FROM katten WHERE naam='{name2del}';"""
-
-    poepout = connect(command)
-    return str(poepout)
+    if request.method == "POST":
+        name2del = request.form.get("naam")
+        command = f"""DELETE FROM katten WHERE naam='{name2del}';"""
+        select_all = """SELECT * FROM katten;"""
+        antwoord = connect(command)
+        if "Mutated" in antwoord:
+            poepout = connect(select_all)
+        return render_template("index.html", poepout = poepout)
+    return render_template("delete.html")
 
 @app.route('/add', methods =["GET", "POST"])
 def add():
-    name2add = request.args['naam']
-    color2add = request.args['kleur'] 
-    age2add = request.args['leeftijd']
-
-    command = f"""INSERT INTO katten VALUES ('{name2add}', '{color2add}', {age2add});"""
-
-    poepout = connect(command)
-    return str(poepout)
+    if request.method == "POST":
+        name2add = request.form.get("naam")
+        color2add = request.form.get("kleur") 
+        age2add = request.form.get("leeftijd")
+        command = f"""INSERT INTO katten VALUES ('{name2add}', '{color2add}', {age2add});"""
+        select_all = """SELECT * FROM katten;"""
+        antwoord = connect(command)
+        if "Mutated" in antwoord:
+            poepout = connect(select_all)
+        return render_template("index.html", poepout = poepout)
+    return render_template("add.html")
 
 @app.route('/edit', methods =["GET", "POST"])
 def edit():
-    name2change = request.args['naam']
-    age2change = request.args['leeftijd']
+    if request.method == "POST":
+        name2change = request.form.get("naam")
+        age2change = request.form.get("leeftijd")
+        command = f"""UPDATE katten SET leeftijd = {age2change} WHERE naam = '{name2change}';"""
+        select_all = """SELECT * FROM katten;"""
+        antwoord = connect(command)
+        if "Mutated" in antwoord:
+            poepout = connect(select_all)
+        return render_template("index.html", poepout = poepout)
+    return render_template("edit.html")
 
-    command = f"""UPDATE katten SET leeftijd = {age2change} WHERE naam = '{name2change}';"""
+@app.route('/check', methods =["GET", "POST"])
+def check():
+    if request.method == "POST":
+        name2check = request.form.get("naam")
+        command = f"""SELECT * FROM katten WHERE naam = '{name2check}';"""
+        poepout = connect(command)
+        return render_template("index.html", poepout = poepout)
+    return render_template("check.html")
 
-    poepout = connect(command)
-    return str(poepout)
 
 if __name__=='__main__':
    app.run()
